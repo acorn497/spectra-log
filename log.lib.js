@@ -1,7 +1,9 @@
 import colors from 'ansi-colors';
 
-const smoothPrint = true;
-const interval = 5;
+let smoothPrint = true;
+let interval = 0;
+let processLevel = 2;
+
 let isProcessing = false;
 let isStandbyActive = false;
 const messageQueue = [];
@@ -25,14 +27,12 @@ colors.gray = defineColor(245);
 colors.dim = defineColor(240);
 colors.orange = defineColor(202);
 
-// bold, italic 등의 스타일 메소드 정의
 const addStyleMethod = (colorFn, styleName, styleCode) => {
   colorFn[styleName] = text => {
     return `\u001b[38;5;${colorFn.colorCode}m${styleCode}${text}\u001b[0m`;
   };
 };
 
-// 각 색상에 스타일 메소드 추가
 Object.keys(colors).forEach(color => {
   if (typeof colors[color] === 'function' && colors[color].colorCode) {
     addStyleMethod(colors[color], 'bold', '\u001b[1m');
@@ -83,13 +83,24 @@ const HTTP_MESSAGE_TYPES = {
   503: { httpLabel: 'SERVER-NAVAL', color: colors.red },
   504: { httpLabel: 'GW-TIMEOUT',   color: colors.red },
 
-  600: { httpLabel: 'SERVER-START', color: colors.green  },
+  600: { httpLabel: 'SERVER-START', color: colors.yellow },
 
   default: { httpLabel: 'UNKNOWN', color: colors.dim }
 };
 
 const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*m/g, '');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getProcessLevel = (levelLabel) => {
+  switch (levelLabel) {
+    case 'FATAL': return 0;
+    case 'ERROR': return 1;
+    case 'INFO': return 2;
+    case 'DEBUG': return 3;
+    case 'TRACE': return 4;
+    default: return 5;
+  }
+}
 
 // --- Formatting Helpers ---
 
@@ -177,8 +188,10 @@ const processQueue = async () => {
 };
 
 export default function log(message, type = 200, level = 'INFO') {
-  messageQueue.push({ message, type, level, timestamp: Date.now() });
-  processQueue();
+  if (processLevel >= getProcessLevel(level)) {
+    messageQueue.push({ message, type, level, timestamp: Date.now() });
+    processQueue();
+  }
 }
 
 // --- Standby Output ---
@@ -202,3 +215,20 @@ const startStandbyLog = () => {
 const stopStandbyLog = () => {
   isStandbyActive = false;
 };
+
+// --- Configuration Functions ---
+
+log.setDebugLevel = (level, options = {}) => {
+  const { silent = false } = options;
+
+  processLevel = getProcessLevel(level);
+  if (!silent) {
+    messageQueue.push({
+      message: `Debug level has been changed to ${level}`,
+      type: 202,
+      level: 'INFO',
+      timestamp: Date.now()
+    });
+    processQueue();
+  }
+}
