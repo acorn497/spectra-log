@@ -1,4 +1,4 @@
-import colors from 'ansi-colors/types';
+import colors from './logger/node_modules/ansi-colors/types';
 
 let smoothPrint = true;
 let interval = 5;
@@ -11,16 +11,6 @@ const messageQueue = [];
 // --- Define custom colors with color codes ---
 
 // --- Message Type and Level Metadata ---
-
-const LEVEL_TYPES = {
-  FATAL: { levelLabel: 'FATAL', color: colors.red.bold },
-  ERROR: { levelLabel: 'ERROR', color: colors.orange.bold },
-  INFO: { levelLabel: 'INFO', color: colors.yellow.bold },
-  DEBUG: { levelLabel: 'DEBUG', color: colors.brightCyan.bold },
-  TRACE: { levelLabel: 'TRACE', color: colors.muteCyan.bold },
-
-  default: { levelLabel: 'NOTLVL', color: colors.red.bold }
-};
 
 const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*m/g, '');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
