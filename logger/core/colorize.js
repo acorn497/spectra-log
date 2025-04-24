@@ -11,7 +11,6 @@ const colorizeString = (message) => {
 
   return message.replace(regex, (match, style, color, text) => {
     style = style?.toLowerCase();
-    color = color.toLowerCase();
     const colorFn = colors[color] || colors.dim;
 
     if (style && typeof colorFn[style] === 'function') {

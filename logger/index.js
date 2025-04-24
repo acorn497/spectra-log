@@ -7,27 +7,25 @@
 const colorizeString = require('./core/colorize.js');
 const processQueue = require('./core/queueProcessor.js');
 const getProcessLevel = require('./util/debugLevel.js');
-const LEVEL_TYPES = require('./config/levelTypes.js');
 
 let { processLevel, interval, smoothPrint } = require('./config/constants.js');
 const { messageQueue } = require('./config/constants.js');
 
 function log(message, type = 200, level = 'INFO', option = {}) {
-  if (processLevel >= getProcessLevel(level)) {
-    const { urgent = false } = option;
-    message = colorizeString(message);
-    if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
-    else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
+  const { urgent = false } = option;
+  message = colorizeString(message);
+  if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
+  else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
 
-    processQueue();
-  }
+  processQueue();
 }
 
 log.setDebugLevel = (level, options = {}) => {
   const { silent = false } = options;
 
-  processLevel = getProcessLevel(level);
-  silentHandler(silent, `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${LEVEL_TYPES[getProcessLevel(level)]} : ${level} }}.`);
+  const temp = getProcessLevel(level);
+  processLevel = temp.level;
+  silentHandler(silent, `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${temp.color} : ${level} }}.`);
 }
 
 log.setPrintSpeed = (delay, options = {}) => {

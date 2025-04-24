@@ -38,4 +38,4 @@ Object.keys(colors).forEach(color => {
   }
 });
 
-module.exports = colors;
+module.exports = colors

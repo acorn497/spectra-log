@@ -6,8 +6,9 @@
 
 const printSmooth = require('./printer.js');
 const { getPrefix } = require('./formatter.js');
+const getProcessLevel = require('../util/debugLevel.js');
 
-let { isProcessing, smoothPrint } = require('../config/constants.js');
+let { isProcessing, smoothPrint, processLevel } = require('../config/constants.js');
 const { messageQueue } = require('../config/constants.js');
 const colors = require('./colorManager.js');
 const getFormattedTime = require('../util/time.js');
@@ -31,6 +32,8 @@ const processQueue = async () => {
   isProcessing = true;
 
   const item = messageQueue.shift();
+  if (processLevel >= getProcessLevel(item.level)) {
+  }
   const { message, type, level, timestamp } = item
   await printMessage(message, type, level, timestamp);
 
