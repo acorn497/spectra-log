@@ -6,7 +6,7 @@
 
 const stripAnsi = require('../util/stripAnsi.js');
 const sleep = require('../util/sleep.js');
-const { interval } = require('../config/constants.js');
+const { getPrintSpeed } = require('../config/constants.js');
 
 const matchAnsiCode = (str) => {
   const match = str.match(/\u001b\[[0-9;]*m/);
@@ -34,7 +34,7 @@ const printLineSmooth = async (line, currentPrefix, terminalWidth) => {
       }
 
       process.stdout.write(chunk[i]);
-      await sleep(interval);
+      await sleep(getPrintSpeed());
       i += 1;
     }
 

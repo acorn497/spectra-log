@@ -5,10 +5,10 @@
 
 
 const printSmooth = require('./printer.js');
-const { getPrefix } = require('./formatter.js');
-const getProcessLevel = require('../util/debugLevel.js');
+const { getPrefix, formatMultiline } = require('./formatter.js');
+const getDebugLevel = require('../util/debugLevel.js');
 
-let { isProcessing, smoothPrint, processLevel } = require('../config/constants.js');
+let { getProcessLevel, getSmoothPrint, getIsProcessing, setIsProcessing } = require('../config/constants.js');
 const { messageQueue } = require('../config/constants.js');
 const colors = require('./colorManager.js');
 const getFormattedTime = require('../util/time.js');
@@ -19,7 +19,7 @@ const printMessage = async (message, type, level, timestamp) => {
   const str = typeof message === 'object' ? JSON.stringify(message, null, 2) || '[Unserializable Object]' : String(message);
   const lines = str.split('\n');
 
-  if (smoothPrint && lines.length > 0) {
+  if (getSmoothPrint() && lines.length > 0) {
     await printSmooth(prefix, lines);
   } else {
     process.stdout.write(`\r${formatMultiline(lines, prefix)}\n`);
@@ -27,17 +27,17 @@ const printMessage = async (message, type, level, timestamp) => {
 };
 
 const processQueue = async () => {
-  if (isProcessing || messageQueue.length === 0) return;
+  if (getIsProcessing() || messageQueue.length === 0) return;
   stopStandbyLog();
-  isProcessing = true;
+  setIsProcessing(true);
 
   const item = messageQueue.shift();
-  if (processLevel >= getProcessLevel(item.level)) {
+  if (getProcessLevel() >= getDebugLevel(item.level)) {
   }
   const { message, type, level, timestamp } = item
   await printMessage(message, type, level, timestamp);
 
-  isProcessing = false;
+  setIsProcessing(false);
   messageQueue.length === 0 ? startStandbyLog() : processQueue();
 };
 

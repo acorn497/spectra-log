@@ -4,7 +4,7 @@
 // --- < Debug level > ---
 
 
-const getProcessLevel = (levelLabel) => {
+const getDebugLevel = (levelLabel) => {
   switch (levelLabel) {
     case 'MUTE': return { level: -1, color: 'dim' };
     case 'FATAL': return { level: 0, color: 'red' };
@@ -16,4 +16,4 @@ const getProcessLevel = (levelLabel) => {
   }
 }
 
-module.exports = getProcessLevel;
+module.exports = getDebugLevel;

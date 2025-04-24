@@ -12,12 +12,32 @@ let isProcessing = false;
 let isStandbyActive = false;
 const messageQueue = [];
 
+const getIsProcessing = () => isProcessing;
+const setIsProcessing = (value) => { isProcessing = value; };
+
+const getSmoothPrint = () => smoothPrint;
+const setSmoothPrint = (value) => { smoothPrint = value; };
+
+const getProcessLevel = () => processLevel;
+const setProcessLevel = (value) => { processLevel = value; };
+
+const getPrintSpeed = () => interval;
+const setPrintSpeed = (value) => { interval = value; };
+
 module.exports = {
-  smoothPrint,
-  interval,
-  processLevel,
-  
-  isProcessing,
+  getIsProcessing,
+  setIsProcessing,
+  getSmoothPrint,
+  setSmoothPrint,
+  getProcessLevel,
+  setProcessLevel,
+  getPrintSpeed,
+  setPrintSpeed,
+  _init: {
+    isProcessing,
+    smoothPrint,
+    processLevel
+  },
   isStandbyActive,
   messageQueue
 }
