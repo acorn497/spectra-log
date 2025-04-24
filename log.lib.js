@@ -209,9 +209,28 @@ const processQueue = async () => {
   messageQueue.length === 0 ? startStandbyLog() : processQueue();
 };
 
-export default function log(message, type = 200, level = 'INFO') {
+const colorizeString = (message) => {
+  const regex = /\{\{\s*(?:(\w+)\s*:\s*)?(\w+)\s*:\s*([^\}]+?)\s*\}\}/g;
+
+  return message.replace(regex, (match, style, color, text) => {
+    style = style?.toLowerCase();
+    color = color.toLowerCase();
+    const colorFn = colors[color] || colors.dim;
+
+    if (style && typeof colorFn[style] === 'function') {
+      return colorFn[style](text);
+    }
+
+    return colorFn(text);
+  });
+};
+
+export default function log(message, type = 200, level = 'INFO', option = {}) {
   if (processLevel >= getProcessLevel(level)) {
-    messageQueue.push({ message, type, level, timestamp: Date.now() });
+    const { urgent = false } = option;
+    message = colorizeString(message);  // 💡 수정됨!
+    if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
+    else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
     processQueue();
   }
 }
@@ -244,13 +263,26 @@ log.setDebugLevel = (level, options = {}) => {
   const { silent = false } = options;
 
   processLevel = getProcessLevel(level);
+  silentHandler(silent, `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${LEVEL_TYPES[getProcessLevel(level)]} : ${level} }}.`);
+}
+
+log.setPrintSpeed = (delay, options = {}) => {
+  const { silent = false } = options;
+
+  interval = delay;
+  silentHandler(silent, `{{ bold : yellow : Smooth process level }} has been set to {{ bold : green : ${interval}ms Per Character }}.`);
+}
+
+log.setSmoothPrint = (value, options = {}) => {
+  const { silent = false } = options;
+
+  smoothPrint = value;
+  silentHandler(silent, `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${smoothPrint ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`);
+}
+
+const silentHandler = (silent, message) => {
   if (!silent) {
-    messageQueue.push({
-      message: `Debug level has been changed to ${level}`,
-      type: 202,
-      level: 'INFO',
-      timestamp: Date.now()
-    });
+    log(message, 202, 'INFO', { urgent: true });
     processQueue();
   }
 }
