@@ -12,9 +12,6 @@ const messageQueue = [];
 
 // --- Message Type and Level Metadata ---
 
-const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*m/g, '');
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const getProcessLevel = (levelLabel) => {
   switch (levelLabel) {
     case 'MUTE': return -1;
@@ -28,11 +25,6 @@ const getProcessLevel = (levelLabel) => {
 }
 
 // --- Formatting Helpers ---
-
-const getFormattedTime = (timestamp) => {
-  const time = new Date(timestamp);
-  return `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}:${String(time.getSeconds()).padStart(2, '0')}`;
-};
 
 const getPrefix = (type, level, timestamp) => {
   const { levelLabel, color: levelColor } = LEVEL_TYPES[level] || LEVEL_TYPES.default;
