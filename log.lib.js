@@ -1,4 +1,4 @@
-import colors from 'ansi-colors';
+import colors from 'ansi-colors/types';
 
 let smoothPrint = true;
 let interval = 5;
@@ -10,38 +10,6 @@ const messageQueue = [];
 
 // --- Define custom colors with color codes ---
 
-const defineColor = (code) => {
-  const colorFn = (text) => `\u001b[38;5;${code}m${text}\u001b[0m`;
-  colorFn.colorCode = code;
-  return colorFn;
-};
-
-colors.red = defineColor(196);
-colors.green = defineColor(82);
-colors.blue = defineColor(33);
-colors.brightCyan = defineColor(116);
-colors.cyan = defineColor(51);
-colors.muteCyan = defineColor(67);
-colors.white = defineColor(255);
-colors.gray = defineColor(245);
-colors.dim = defineColor(240);
-colors.orange = defineColor(202);
-
-const addStyleMethod = (colorFn, styleName, styleCode) => {
-  colorFn[styleName] = text => {
-    return `\u001b[38;5;${colorFn.colorCode}m${styleCode}${text}\u001b[0m`;
-  };
-};
-
-Object.keys(colors).forEach(color => {
-  if (typeof colors[color] === 'function' && colors[color].colorCode) {
-    addStyleMethod(colors[color], 'bold', '\u001b[1m');
-    addStyleMethod(colors[color], 'dim', '\u001b[2m');
-    addStyleMethod(colors[color], 'italic', '\u001b[3m');
-    addStyleMethod(colors[color], 'underline', '\u001b[4m');
-  }
-});
-
 // --- Message Type and Level Metadata ---
 
 const LEVEL_TYPES = {
@@ -52,40 +20,6 @@ const LEVEL_TYPES = {
   TRACE: { levelLabel: 'TRACE', color: colors.muteCyan.bold },
 
   default: { levelLabel: 'NOTLVL', color: colors.red.bold }
-};
-
-const HTTP_MESSAGE_TYPES = {
-  100: { httpLabel: 'CONTINUE', color: colors.dim },
-  101: { httpLabel: 'SWITCHING', color: colors.dim },
-
-  200: { httpLabel: 'OK', color: colors.green },
-  201: { httpLabel: 'CREATED', color: colors.green },
-  202: { httpLabel: 'ACCEPTED', color: colors.cyan },
-  204: { httpLabel: 'NO-CONTENT', color: colors.gray },
-
-  301: { httpLabel: 'MOVED', color: colors.yellow },
-  302: { httpLabel: 'FOUND', color: colors.yellow },
-  304: { httpLabel: 'NOT-MODIFIED', color: colors.gray },
-
-  400: { httpLabel: 'BAD-REQUEST', color: colors.orange },
-  401: { httpLabel: 'UNAUTHZED', color: colors.orange },
-  402: { httpLabel: 'PAY-REQUEST', color: colors.orange },
-  403: { httpLabel: 'FORBIDDEN', color: colors.red },
-  404: { httpLabel: 'NOT-FOUND', color: colors.red },
-  405: { httpLabel: 'NO-METHOD', color: colors.orange },
-  408: { httpLabel: 'TIMEOUT', color: colors.orange },
-  409: { httpLabel: 'CONFLICT', color: colors.orange },
-  410: { httpLabel: 'GONE', color: colors.orange },
-  429: { httpLabel: 'TOO-MANY', color: colors.orange },
-
-  500: { httpLabel: 'SERVER-ERROR', color: colors.red },
-  502: { httpLabel: 'BAD-GATEWAY', color: colors.red },
-  503: { httpLabel: 'SERVER-NAVAL', color: colors.red },
-  504: { httpLabel: 'GW-TIMEOUT', color: colors.red },
-
-  600: { httpLabel: 'SERVER-START', color: colors.yellow },
-
-  default: { httpLabel: 'UNKNOWN', color: colors.dim }
 };
 
 const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*m/g, '');
@@ -142,7 +76,7 @@ const formatMultiline = (lines, prefix, maxWidth = Math.floor(process.stdout.col
 const matchAnsiCode = (str) => {
   const match = str.match(/\u001b\[[0-9;]*m/);
   if (match && match.index === 0) {
-    return match[0]; // 시작 위치에 있는 ANSI 코드만 감지
+    return match[0];
   }
   return null;
 };
@@ -160,7 +94,7 @@ const printLineSmooth = async (line, currentPrefix, terminalWidth) => {
 
       if (ansi) {
         process.stdout.write(ansi);
-        i += ansi.length; // ANSI 코드 길이만큼 점프
+        i += ansi.length; 
         continue;
       }
 
@@ -228,7 +162,7 @@ const colorizeString = (message) => {
 export default function log(message, type = 200, level = 'INFO', option = {}) {
   if (processLevel >= getProcessLevel(level)) {
     const { urgent = false } = option;
-    message = colorizeString(message);  // 💡 수정됨!
+    message = colorizeString(message);
     if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
     else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
     processQueue();
