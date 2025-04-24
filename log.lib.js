@@ -26,6 +26,7 @@ colors.white = defineColor(255);
 colors.gray = defineColor(245);
 colors.dim = defineColor(240);
 colors.orange = defineColor(202);
+colors.yellow = defineColor(220);  // Added yellow definition
 
 const addStyleMethod = (colorFn, styleName, styleCode) => {
   colorFn[styleName] = text => {
@@ -93,6 +94,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getProcessLevel = (levelLabel) => {
   switch (levelLabel) {
+    case 'MUTE': return -1;
     case 'FATAL': return 0;
     case 'ERROR': return 1;
     case 'INFO': return 2;
@@ -119,6 +121,25 @@ const getPrefix = (type, level, timestamp) => {
   return `[ ${levelColor(fullLabel.padEnd(6))} | ${typeColor(httpLabel.padEnd(12))} | ${getFormattedTime(timestamp)} ] | `;
 };
 
+// --- Parse colored message syntax ---
+// New function to parse color tags in messages
+const parseColoredMessage = (message) => {
+  if (typeof message !== 'string') {
+    return message;
+  }
+  
+  // Match patterns like {{color:text}} or {{color.style:text}}
+  return message.replace(/{{(\w+)(\.(\w+))?:(.*?)}}/g, (match, color, _, style, text) => {
+    if (!colors[color]) return text; // If color doesn't exist, return just the text
+    
+    if (style && colors[color][style]) {
+      return colors[color][style](text);
+    } else {
+      return colors[color](text);
+    }
+  });
+};
+
 const formatMultiline = (lines, prefix, maxWidth = Math.floor(process.stdout.columns * 0.9) || 80) => {
   const visualPrefixLength = stripAnsi(prefix).length;
   const linePad = ' '.repeat(26) + '| ';
@@ -126,11 +147,44 @@ const formatMultiline = (lines, prefix, maxWidth = Math.floor(process.stdout.col
 
   lines.forEach((line, i) => {
     const availWidth = maxWidth - (i === 0 ? visualPrefixLength : 28);
-    const chunks = line.match(new RegExp(`.{1,${availWidth}}`, 'g')) || [''];
-    chunks.forEach((chunk, j) => {
-      const linePrefix = (i === 0 && j === 0) ? prefix : linePad;
-      formatted.push(`${linePrefix}${chunk}`);
-    });
+    // Don't split ANSI color codes when wrapping text
+    const processedLine = parseColoredMessage(line);
+    const strippedLine = stripAnsi(processedLine);
+    
+    // Handle wrapping with consideration for color codes
+    if (strippedLine.length <= availWidth) {
+      formatted.push(`${i === 0 ? prefix : linePad}${processedLine}`);
+    } else {
+      // For colored text that needs wrapping, we need a more sophisticated approach
+      let currentLine = '';
+      let currentStripped = '';
+      let remainingProcessed = processedLine;
+      let remainingStripped = strippedLine;
+      
+      while (remainingStripped.length > 0) {
+        const nextChar = remainingProcessed[0];
+        const nextStrippedChar = remainingStripped[0];
+        
+        currentLine += nextChar;
+        if (nextChar !== nextStrippedChar) {
+          // This is part of a color code, don't count against width
+        } else {
+          currentStripped += nextStrippedChar;
+          if (currentStripped.length >= availWidth) {
+            formatted.push(`${formatted.length === 0 && i === 0 ? prefix : linePad}${currentLine}`);
+            currentLine = '';
+            currentStripped = '';
+          }
+        }
+        
+        remainingProcessed = remainingProcessed.slice(1);
+        remainingStripped = remainingStripped.slice(1);
+      }
+      
+      if (currentLine) {
+        formatted.push(`${formatted.length === 0 && i === 0 ? prefix : linePad}${currentLine}`);
+      }
+    }
   });
 
   return formatted.join('\n');
@@ -139,24 +193,67 @@ const formatMultiline = (lines, prefix, maxWidth = Math.floor(process.stdout.col
 // --- Smooth Printing Logic ---
 
 const printLineSmooth = async (line, currentPrefix, terminalWidth) => {
+  const processedLine = parseColoredMessage(line);
   const avail = terminalWidth - stripAnsi(currentPrefix).length;
-  const chunks = [line.slice(0, avail), ...(line.slice(avail).match(new RegExp(`.{1,${terminalWidth - 28}}`, 'g')) || [])];
-
-  for (const chunk of chunks) {
-    for (let i = 1; i <= chunk.length; i++) {
-      process.stdout.write(`\r${currentPrefix}${chunk.slice(0, i)}`);
+  
+  // Handle colored text carefully for smooth printing
+  const totalLength = stripAnsi(processedLine).length;
+  
+  if (totalLength <= avail) {
+    // If the line fits, print it character by character
+    for (let i = 1; i <= processedLine.length; i++) {
+      const segment = processedLine.slice(0, i);
+      process.stdout.write(`\r${currentPrefix}${segment}`);
       await sleep(interval);
     }
     console.log();
-    currentPrefix = ' '.repeat(36) + ' | ';
+  } else {
+    // For longer lines, need a more complex approach to handle color codes
+    let currentPosition = 0;
+    let visiblePosition = 0;
+    
+    while (currentPosition < processedLine.length) {
+      // Find the next position where we'd wrap
+      let endPos = currentPosition;
+      let visibleCounter = 0;
+      
+      while (endPos < processedLine.length && visibleCounter < avail) {
+        // Check if we're at the start of a color code
+        if (processedLine[endPos] === '\u001b') {
+          // Skip the entire color code without counting it as visible character
+          while (endPos < processedLine.length && processedLine[endPos] !== 'm') {
+            endPos++;
+          }
+          if (endPos < processedLine.length) endPos++; // Skip the 'm' too
+        } else {
+          // Normal character
+          visibleCounter++;
+          endPos++;
+        }
+      }
+      
+      // Now print this chunk character by character
+      let chunkEndPos = Math.min(endPos, processedLine.length);
+      for (let i = currentPosition + 1; i <= chunkEndPos; i++) {
+        process.stdout.write(`\r${currentPrefix}${processedLine.slice(currentPosition, i)}`);
+        await sleep(interval);
+      }
+      console.log();
+      
+      currentPosition = chunkEndPos;
+      currentPrefix = ' '.repeat(26) + '| ';
+    }
   }
 };
 
 const printSmooth = async (prefix, lines) => {
   const terminalWidth = Math.floor(process.stdout.columns * 0.9) || 80;
-  await printLineSmooth(lines[0], prefix, terminalWidth);
-  for (let i = 1; i < lines.length; i++) {
-    await printLineSmooth(lines[i], ' '.repeat(26) + '| ', terminalWidth);
+  for (let i = 0; i < lines.length; i++) {
+    await printLineSmooth(
+      lines[i], 
+      i === 0 ? prefix : ' '.repeat(26) + '| ', 
+      terminalWidth
+    );
   }
 };
 
@@ -164,8 +261,17 @@ const printSmooth = async (prefix, lines) => {
 
 const printMessage = async (message, type, level, timestamp) => {
   const prefix = getPrefix(type, level, timestamp);
-  const str = typeof message === 'object' ? JSON.stringify(message, null, 2) || '[Unserializable Object]' : String(message);
-  const lines = str.split('\n');
+  
+  // Handle both object and string messages
+  let processedMessage;
+  if (typeof message === 'object') {
+    processedMessage = JSON.stringify(message, null, 2) || '[Unserializable Object]';
+  } else {
+    // String messages can contain color tags
+    processedMessage = String(message);
+  }
+  
+  const lines = processedMessage.split('\n');
 
   if (smoothPrint && lines.length > 0) {
     await printSmooth(prefix, lines);
@@ -223,8 +329,9 @@ log.setDebugLevel = (level, options = {}) => {
 
   processLevel = getProcessLevel(level);
   if (!silent) {
+
     messageQueue.push({
-      message: `Debug level has been changed to ${level}`,
+      message: `DEBUG LEVEL has been changed to ${level}`,
       type: 202,
       level: 'INFO',
       timestamp: Date.now()
@@ -232,3 +339,28 @@ log.setDebugLevel = (level, options = {}) => {
     processQueue();
   }
 }
+
+log.setSmoothPrint = (isActive = false, printSpeed = 5, options = {}) => {
+  const { silent = false } = options;
+
+  smoothPrint = isActive;
+  interval = printSpeed;
+  if (!silent) {
+    messageQueue.push({
+      message: `SMOOTH PRINT status has been ${smoothPrint ? `Activated with speed: ${interval}` : `Deactivated`}`,
+      type: 202,
+      level: 'INFO',
+      timestamp: Date.now()
+    });
+    processQueue();
+  }
+}
+
+log.colors = {
+  ...Object.keys(colors).reduce((acc, color) => {
+    if (typeof colors[color] === 'function') {
+      acc[color] = colors[color];
+    }
+    return acc;
+  }, {})
+};
