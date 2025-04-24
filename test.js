@@ -1,7 +1,6 @@
-import log from '../log.lib.js';
+const log = require('./logger/index.js');
 
 log.setDebugLevel('MUTE', { silent: true });
-
 log(`Server is Running...`, 600);
 log('Hello, Woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooorld!', 200, 'INFO');
 log('Hello, World!', 100, 'TRACE');
