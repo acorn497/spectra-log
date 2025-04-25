@@ -6,8 +6,8 @@
 
 const LEVEL_TYPES = require('../config/levelTypes.js');
 const HTTP_MESSAGE_TYPES = require('../config/httpTypes.js');
-const getFormattedTime = require('../util/time.js');
-const stripAnsi = require('../util/stripAnsi.js');
+const getFormattedTime = require('../logger/util/time.js');
+const stripAnsi = require('../logger/util/stripAnsi.js');
 
 const getPrefix = (type, level, timestamp) => {
   const { levelLabel, color: levelColor } = LEVEL_TYPES[level] || LEVEL_TYPES.default;
