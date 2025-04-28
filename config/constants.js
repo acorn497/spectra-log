@@ -4,12 +4,12 @@
 // --- < smoothPrint, interval 등 기본 설정 값 > ---
 
 
-let smoothPrint = true;
+let smoothPrint = false;
 let interval = 5;
 let processLevel = 2;
 
 let isProcessing = false;
-let isStandbyActive = false;
+let displayStandby = false;
 const messageQueue = [];
 
 const getIsProcessing = () => isProcessing;
@@ -24,8 +24,8 @@ const setProcessLevel = (value) => { processLevel = value; };
 const getPrintSpeed = () => interval;
 const setPrintSpeed = (value) => { interval = value; };
 
-const getStandby = () => isStandbyActive;
-const setStandby = (value) => { isStandbyActive = value };
+const getDisplayStandby = () => displayStandby;
+const setDisplayStandby = (value) => { displayStandby = value };
 
 module.exports = {
   getIsProcessing,
@@ -36,13 +36,12 @@ module.exports = {
   setProcessLevel,
   getPrintSpeed,
   setPrintSpeed,
-  getStandby,
-  setStandby,
+  getDisplayStandby,
+  setDisplayStandby,
   _init: {
     isProcessing,
     smoothPrint,
     processLevel
   },
-  isStandbyActive,
   messageQueue
 }

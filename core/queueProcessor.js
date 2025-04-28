@@ -8,11 +8,12 @@ const printSmooth = require('./printer.js');
 const { getPrefix, formatMultiline } = require('./formatter.js');
 const getDebugLevel = require('../util/debugLevel.js');
 
-let { getProcessLevel, getSmoothPrint, getIsProcessing, setIsProcessing } = require('../config/constants.js');
+let { getProcessLevel, getSmoothPrint, getIsProcessing, setIsProcessing, getDisplayStandby } = require('../config/constants.js');
 const { messageQueue } = require('../config/constants.js');
 const colors = require('./colorManager.js');
 const getFormattedTime = require('../util/time.js');
 const sleep = require('../util/sleep.js');
+let isStandbyActive = false;
 
 const printMessage = async (message, type, level, timestamp) => {
   const prefix = getPrefix(type, level, timestamp);
@@ -42,7 +43,7 @@ const processQueue = async () => {
 };
 
 const startStandbyLog = () => {
-  if (isStandbyActive) return;
+  if (!getDisplayStandby() || isStandbyActive) return;
   isStandbyActive = true;
 
   (async function standbyLoop() {

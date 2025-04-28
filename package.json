@@ -1,7 +1,7 @@
 {
-  "name": "enhanced-console-log",
-  "version": "1.0.0",
-  "description": "An enhanced version of console.log",
+  "name": "spectra-log",
+  "version": "1.0.1",
+  "description": "SpectraLog enables you to apply various colors to your log messages, enhancing readability and making your logs visually dynamic.",
   "main": "index.js",
   "dependencies": {
     "ansi-colors": "^4.1.3"

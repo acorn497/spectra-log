@@ -8,12 +8,12 @@ const colorizeString = require('./core/colorize.js');
 const processQueue = require('./core/queueProcessor.js');
 const getDebugLevel = require('./util/debugLevel.js');
 
-let { setProcessLevel, getProcessLevel, setSmoothPrint, setPrintSpeed, setStandby } = require('./config/constants.js');
+let { setProcessLevel, getProcessLevel, setSmoothPrint, setPrintSpeed, setDisplayStandby } = require('./config/constants.js');
 const { messageQueue } = require('./config/constants.js');
 
 function log(message, type = 200, level = 'INFO', option = {}) {
-  const { urgent = false } = option;
-  if (urgent || getProcessLevel() >= getDebugLevel(level).level) {
+  const { urgent = false, force = false } = option;
+  if (force || getProcessLevel() >= getDebugLevel(level).level) {
     message = colorizeString(message);
     if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
     else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
@@ -44,16 +44,16 @@ log.setSmoothPrint = (value, options = {}) => {
   silentHandler(silent, `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`);
 }
 
-log.setStandby = (value, options = {}) => {
+log.setDisplayStandby = (value, options = {}) => {
   const { silent = false } = options;
 
-  setStandby(value);
+  setDisplayStandby(value);
   silentHandler(silent, `{{ bold : yellow : Stand by }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`);
 }
 
 const silentHandler = (silent, message) => {
   if (!silent) {
-    log(message, 202, 'INFO', { urgent: true });
+    log(message, 202, 'INFO', { force: true });
     processQueue();
   }
 }

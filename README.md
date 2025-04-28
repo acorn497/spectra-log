@@ -1,6 +1,6 @@
 # 🌈 SpectraLog
 
-> Beautiful terminal logging with style and color superpowers
+> Lightweight, colorful, and expressive terminal logging
 
 **SpectraLog** transforms boring console logs into **vibrant**, **stylish** output that improves readability and makes your application logs more expressive. With customizable log levels, smooth printing animation, and rich text formatting, SpectraLog brings your terminal to life.
 
@@ -108,7 +108,7 @@ log(message, type, level, options);
 | `message` | `string` | Text to display                                  | Required |
 | `type`    | `number` | HTTP-style or custom numeric tag                 | `200`    |
 | `level`   | `string` | Log level (INFO, DEBUG, ERROR, etc.)             | `"INFO"` |
-| `options` | `object` | `{ urgent: boolean }` - Set true to bypass queue | `{}`     |
+| `options` | `object` | `{ urgent: boolean }` - Set true to bypass queue, { always-print: boolean } - set true to output regardless of debug level | `{}`     |
 
 ## HTTP Status Code Support
 
