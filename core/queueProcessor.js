@@ -6,13 +6,13 @@
 
 const printSmooth = require('./printer.js');
 const { getPrefix, formatMultiline } = require('./formatter.js');
-const getDebugLevel = require('../logger/util/debugLevel.js');
+const getDebugLevel = require('../util/debugLevel.js');
 
 let { getProcessLevel, getSmoothPrint, getIsProcessing, setIsProcessing } = require('../config/constants.js');
 const { messageQueue } = require('../config/constants.js');
 const colors = require('./colorManager.js');
-const getFormattedTime = require('../logger/util/time.js');
-const sleep = require('../logger/util/sleep.js');
+const getFormattedTime = require('../util/time.js');
+const sleep = require('../util/sleep.js');
 
 const printMessage = async (message, type, level, timestamp) => {
   const prefix = getPrefix(type, level, timestamp);

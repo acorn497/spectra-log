@@ -24,6 +24,9 @@ const setProcessLevel = (value) => { processLevel = value; };
 const getPrintSpeed = () => interval;
 const setPrintSpeed = (value) => { interval = value; };
 
+const getStandby = () => isStandbyActive;
+const setStandby = (value) => { isStandbyActive = value };
+
 module.exports = {
   getIsProcessing,
   setIsProcessing,
@@ -33,6 +36,8 @@ module.exports = {
   setProcessLevel,
   getPrintSpeed,
   setPrintSpeed,
+  getStandby,
+  setStandby,
   _init: {
     isProcessing,
     smoothPrint,

@@ -4,8 +4,8 @@
 // --- < printSmooth, printLineSmooth > ---
 
 
-const stripAnsi = require('../logger/util/stripAnsi.js');
-const sleep = require('../logger/util/sleep.js');
+const stripAnsi = require('../util/stripAnsi.js');
+const sleep = require('../util/sleep.js');
 const { getPrintSpeed } = require('../config/constants.js');
 
 const matchAnsiCode = (str) => {
