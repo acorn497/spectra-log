@@ -4,7 +4,7 @@
 
 **SpectraLog** transforms boring console logs into **vibrant**, **stylish** output that improves readability and makes your application logs more expressive. With customizable log levels, smooth printing animation, and rich text formatting, SpectraLog brings your terminal to life.
 
-![npm version](https://img.shields.io/badge/npm-v11.3.0-blue) ![license](https://img.shields.io/badge/license-MIT-green)
+[![npm version](https://img.shields.io/npm/v/spectra-log)](https://www.npmjs.com/package/spectra-log) ![license](https://img.shields.io/badge/license-MIT-green)
 
 ## 📋 Table of Contents
 - [Installation](#-installation)
@@ -184,6 +184,7 @@ If an unrecognized status code is provided, the logger will use:
 |---------|-------|--------------------------|
 | UNKNOWN | Dim   | Unknown status code      |
 
+```markdown
 ## 🛠️ Configuration
 
 ### Set Debug Level
@@ -206,6 +207,43 @@ log.setSmoothPrint(true);
 
 // Set animation speed (ms per character)
 log.setPrintSpeed(10);
+```
+
+### Urgent and Force Options
+You can override the default log queue behavior with `urgent` and `force` options.
+
+- **urgent**: Marks the log as urgent, which means it will bypass the default queue and print immediately. However, it will still be subject to the current debug level. If the debug level is set to a level that doesn't show the log, the urgent log may still be suppressed.
+also When smooth printing is enabled, the effect of an urgent log is even more pronounced, as it will immediately be displayed without the animation delay.
+
+- **force**: Forces the log to be displayed regardless of the debug level. Even if the debug level is set to `MUTE` or a level that would normally suppress the log, it will always be printed.
+
+```javascript
+// Urgent log that jumps the queue
+log("This prints immediately!", 500, "ERROR", { urgent: true });
+
+// Force log that bypasses both queue and debug level
+log("This is always displayed!", 200, "INFO", { force: true });
+```
+
+### Example Usage of `urgent` and `force`
+
+```javascript
+const log = require('spectra-log');
+
+// Set debug level to ERROR (only ERROR and FATAL logs will show)
+log.setDebugLevel('ERROR');
+
+// Urgent log (will print immediately but may still be suppressed by debug level)
+log("This is an urgent log!", 200, "INFO", { urgent: true });
+
+// Force log (will always print, even if debug level is set to MUTE)
+log("This log will always print!", 200, "INFO", { force: true });
+
+// Normal log (will be suppressed because the level is set to ERROR)
+log("This is a normal log", 200, "INFO");
+``` 
+
+The `urgent` and `force` options give you more flexibility in controlling log behavior while respecting the debug level configurations.
 ```
 
 ## 🔁 Queue Management
@@ -253,4 +291,4 @@ log("🚨 {{ bold : magenta : Critical system failure }}", 500, "FATAL", { urgen
 ## 📜 License
 
 MIT License  
-2025 Copyright © [acorn497](https://github.com/acorn497)
+2025 Copyright © [acorn497](https://github.com/acorn497 )
