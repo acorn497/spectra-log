@@ -24,6 +24,7 @@
 ```bash
 npm install spectra-log
 ```
+![image](https://i.imgur.com/AaKCD2o.gif)
 
 ## ✨ Quick Start
 
@@ -55,9 +56,12 @@ log("Text {{ style : color : content }} more text");
 - `italic` - Make text italic
 - `underline` - Add underline to text
 
-### Color Options
-Any CSS-valid color or these predefined colors:
-- `red`, `orange`, `yellow`, `green`, `blue`, `cyan`, `magenta`, `white`, `gray`
+### Color Options  
+- ` red `, ` brightRed `, ` orange `, ` yellow `, ` brightYellow `, ` green `, ` brightGreen `, ` lime `,  
+- ` blue `, ` brightBlue `, ` cyan `, ` brightCyan `, ` muteCyan `, ` teal `,  
+- ` magenta `, ` pink `, ` purple `, ` violet `,  
+- ` brown `, ` gold `, ` maroon `,  
+- ` white `, ` silver `, ` gray `, ` dim `
 
 ### Examples
 
@@ -108,7 +112,7 @@ log(message, type, level, options);
 | `message` | `string` | Text to display                                  | Required |
 | `type`    | `number` | HTTP-style or custom numeric tag                 | `200`    |
 | `level`   | `string` | Log level (INFO, DEBUG, ERROR, etc.)             | `"INFO"` |
-| `options` | `object` | `{ urgent: boolean }` - Set true to bypass queue, { always-print: boolean } - set true to output regardless of debug level | `{}`     |
+| `options` | `object` | `{ urgent: boolean }` - Set true to bypass queue, { force: boolean } - set true to output regardless of debug level | `{}`     |
 
 ## HTTP Status Code Support
 
@@ -184,7 +188,6 @@ If an unrecognized status code is provided, the logger will use:
 |---------|-------|--------------------------|
 | UNKNOWN | Dim   | Unknown status code      |
 
-```markdown
 ## 🛠️ Configuration
 
 ### Set Debug Level
@@ -221,7 +224,7 @@ also When smooth printing is enabled, the effect of an urgent log is even more p
 // Urgent log that jumps the queue
 log("This prints immediately!", 500, "ERROR", { urgent: true });
 
-// Force log that bypasses both queue and debug level
+// Force log that bypasses queue 
 log("This is always displayed!", 200, "INFO", { force: true });
 ```
 
@@ -244,7 +247,16 @@ log("This is a normal log", 200, "INFO");
 ``` 
 
 The `urgent` and `force` options give you more flexibility in controlling log behavior while respecting the debug level configurations.
+
+
+### 🌙 Standby Mode  
+Enable a standby indicator that remains active until the program is manually terminated.
+
+```javascript
+log.setDisplayStandBy(true);
 ```
+
+> This will show a live standby line in the terminal until the process is aborted.
 
 ## 🔁 Queue Management
 

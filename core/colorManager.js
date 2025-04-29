@@ -22,6 +22,19 @@ colors.white = defineColor(255);
 colors.gray = defineColor(245);
 colors.dim = defineColor(240);
 colors.orange = defineColor(202);
+colors.pink = defineColor(213);
+colors.purple = defineColor(135);
+colors.violet = defineColor(129);
+colors.teal = defineColor(37);
+colors.brightYellow = defineColor(226);
+colors.brightGreen = defineColor(118);
+colors.brightRed = defineColor(196);
+colors.brightBlue = defineColor(75);
+colors.brown = defineColor(130);
+colors.gold = defineColor(220);
+colors.lime = defineColor(154);
+colors.silver = defineColor(250);
+colors.maroon = defineColor(88);
 
 const addStyleMethod = (colorFn, styleName, styleCode) => {
   colorFn[styleName] = text => {
