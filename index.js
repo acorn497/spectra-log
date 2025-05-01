@@ -60,7 +60,7 @@ log.setSmoothPrint = (value, options = {}) => {
   );
 };
 
-log.setDisplayStandby = (value, options = {}) => {
+log.setDisplayStandBy = (value, options = {}) => {
   const { silent = false } = options;
 
   setDisplayStandby(value);
