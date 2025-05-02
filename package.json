@@ -1,6 +1,6 @@
 {
   "name": "spectra-log",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "SpectraLog enables you to apply various colors to your log messages, enhancing readability and making your logs visually dynamic.",
   "homepage": "https://github.com/acorn497/spectra-log",
   "main": "index.js",

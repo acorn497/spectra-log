@@ -54,10 +54,18 @@ log.setSmoothPrint = (value, options = {}) => {
   setSmoothPrint(value);
   silentHandler(
     silent,
-    `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${
-      value ? "green : ACTIVATED" : "red : DEACTIVATED"
-    } }}.`
+    `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`
   );
+};
+
+log.setDisplayStandby = (value, options = {}) => {
+  setDisplayStandby(value);
+  deprecationHandler(
+    `{{ bold : yellow : Stand by }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}`,
+    "setDisplayStandby()",
+    "setDisplayStandBy()"
+  );
+  processQueue();
 };
 
 log.setDisplayStandBy = (value, options = {}) => {
@@ -66,9 +74,7 @@ log.setDisplayStandBy = (value, options = {}) => {
   setDisplayStandby(value);
   silentHandler(
     silent,
-    `{{ bold : yellow : Stand by }} mode has been {{ bold : ${
-      value ? "green : ACTIVATED" : "red : DEACTIVATED"
-    } }}.`
+    `{{ bold : yellow : Stand by }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`
   );
 };
 
@@ -78,5 +84,12 @@ const silentHandler = (silent, message) => {
     processQueue();
   }
 };
+
+const deprecationHandler = (message, before, after) => {
+  log(
+    `${message}
+    \n[{{ bold : red : DEPRECATION WARNING }}] {{ bold : yellow : ${before} }} is deprecated. Use {{ bold : green : ${after} }} instead.\nIt will be removed at next Major update.\n`
+  );
+}
 
 export default log;
