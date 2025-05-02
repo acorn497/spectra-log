@@ -1,61 +1,82 @@
-
 // >  DIR | /index.js
 
 // --- < main controller of modern-cli-logger > ---
 
+import colorizeString from "./core/colorize.js";
+import processQueue from "./core/queueProcessor.js";
+import getDebugLevel from "./util/debugLevel.js";
 
-const colorizeString = require('./core/colorize.js');
-const processQueue = require('./core/queueProcessor.js');
-const getDebugLevel = require('./util/debugLevel.js');
+import {
+  setProcessLevel,
+  getProcessLevel,
+  setSmoothPrint,
+  setPrintSpeed,
+  setDisplayStandby,
+} from "./config/constants.js";
+import { messageQueue } from "./config/constants.js";
 
-let { setProcessLevel, getProcessLevel, setSmoothPrint, setPrintSpeed, setDisplayStandby } = require('./config/constants.js');
-const { messageQueue } = require('./config/constants.js');
-
-function log(message, type = 200, level = 'INFO', option = {}) {
+const log = (message, type = 200, level = "INFO", option = {}) => {
   const { urgent = false, force = false } = option;
   if (force || getProcessLevel() >= getDebugLevel(level).level) {
     message = colorizeString(message);
-    if (!urgent) messageQueue.push({ message, type, level, timestamp: Date.now() });
-    else messageQueue.unshift({ message, type, level, timestamp: Date.now() })
+    if (!urgent)
+      messageQueue.push({ message, type, level, timestamp: Date.now() });
+    else messageQueue.unshift({ message, type, level, timestamp: Date.now() });
 
     processQueue();
   }
-}
+};
 
 log.setDebugLevel = (level, options = {}) => {
   const { silent = false } = options;
 
   const temp = getDebugLevel(level);
   setProcessLevel(temp.level);
-  silentHandler(silent, `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${temp.color} : ${level} }}.`);
-}
+  silentHandler(
+    silent,
+    `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${temp.color} : ${level} }}.`
+  );
+};
 
 log.setPrintSpeed = (delay, options = {}) => {
   const { silent = false } = options;
 
   setPrintSpeed(delay);
-  silentHandler(silent, `{{ bold : yellow : Smooth process level }} has been set to {{ bold : green : ${delay}ms Per Character }}.`);
-}
+  silentHandler(
+    silent,
+    `{{ bold : yellow : Smooth process level }} has been set to {{ bold : green : ${delay}ms Per Character }}.`
+  );
+};
 
 log.setSmoothPrint = (value, options = {}) => {
   const { silent = false } = options;
 
   setSmoothPrint(value);
-  silentHandler(silent, `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`);
-}
+  silentHandler(
+    silent,
+    `{{ bold : yellow : Smooth print }} mode has been {{ bold : ${
+      value ? "green : ACTIVATED" : "red : DEACTIVATED"
+    } }}.`
+  );
+};
 
-log.setDisplayStandby = (value, options = {}) => {
+log.setDisplayStandBy = (value, options = {}) => {
   const { silent = false } = options;
 
   setDisplayStandby(value);
-  silentHandler(silent, `{{ bold : yellow : Stand by }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}.`);
-}
+  silentHandler(
+    silent,
+    `{{ bold : yellow : Stand by }} mode has been {{ bold : ${
+      value ? "green : ACTIVATED" : "red : DEACTIVATED"
+    } }}.`
+  );
+};
 
 const silentHandler = (silent, message) => {
   if (!silent) {
-    log(message, 202, 'INFO', { force: true });
+    log(message, 202, "INFO", { force: true });
     processQueue();
   }
-}
+};
 
-module.exports = log;
+export default log;

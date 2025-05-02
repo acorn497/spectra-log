@@ -1,10 +1,8 @@
-
 // >  DIR | /core/colorize.js
 
 // --- < {{ style : color : text }} 처리 > ---
 
-
-const colors = require('./colorManager.js')
+import colors from "./colorManager.js";
 
 const colorizeString = (message) => {
   const regex = /\{\{\s*(?:(\w+)\s*:\s*)?(\w+)\s*:\s*([^\}]+?)\s*\}\}/g;
@@ -13,7 +11,7 @@ const colorizeString = (message) => {
     style = style?.toLowerCase();
     const colorFn = colors[color] || colors.dim;
 
-    if (style && typeof colorFn[style] === 'function') {
+    if (style && typeof colorFn[style] === "function") {
       return colorFn[style](text);
     }
 
@@ -21,4 +19,4 @@ const colorizeString = (message) => {
   });
 };
 
-module.exports = colorizeString;
+export default colorizeString;
