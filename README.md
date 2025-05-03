@@ -6,6 +6,8 @@
 
 [![npm version](https://img.shields.io/npm/v/spectra-log)](https://www.npmjs.com/package/spectra-log) ![license](https://img.shields.io/badge/license-MIT-green)
 
+![image](https://i.imgur.com/AaKCD2o.gif)
+
 ## 📋 Table of Contents
 
 - [Installation](#-installation)
@@ -22,16 +24,15 @@
 
 ## 📦 Installation
 
-```bash
+```bash*
 npm install spectra-log
 ```
-
-![image](https://i.imgur.com/AaKCD2o.gif)
+> You must use ESM to use this package.
 
 ## ✨ Quick Start
 
 ```javascript
-const log = require("spectra-log");
+import log from "spectra-log";
 
 // Simple log message
 log("This is a standard log message");
@@ -129,7 +130,7 @@ SpectraLog includes built-in support for HTTP status codes with appropriate colo
 When logging, you can pass an HTTP status code as the second parameter:
 
 ```javascript
-const log = require("spectra-log");
+import log from "spectra-log";
 
 // Log with HTTP status codes
 log("User authentication successful", 200); // Green "OK" tag
@@ -247,7 +248,7 @@ log("This is always displayed!", 200, "INFO", { force: true });
 ### Example Usage of `urgent` and `force`
 
 ```javascript
-const log = require("spectra-log");
+import log from "spectra-log";
 
 // Set debug level to ERROR (only ERROR and FATAL logs will show)
 log.setDebugLevel("ERROR");
@@ -297,7 +298,7 @@ When idle, SpectraLog displays a standby indicator that updates every second:
 ## 🧩 Complete Example
 
 ```javascript
-const log = require("spectra-log");
+import log from "spectra-log";
 
 // Configure logger
 log.setDebugLevel("DEBUG");
