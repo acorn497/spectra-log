@@ -33,6 +33,8 @@ npm install spectra-log
 
 ```javascript
 import log from "spectra-log";
+// if you're using CJS, then use:
+// const log = require("spectra-log");
 
 // Simple log message
 log("This is a standard log message");

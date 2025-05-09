@@ -4,6 +4,14 @@
 
 ---
 
+## \[v1.4.0] - 2025-05-09
+
+## Features
+
+* Added CJS/ESM Multi-Support
+
+---
+
 ## \[v1.3.0] - 2025-05-02
 
 ### Changes
