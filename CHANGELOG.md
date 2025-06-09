@@ -4,6 +4,16 @@
 
 ---
 
+## \[1.5.0] - 2025-06-09
+### Added
+- Support for logging objects directly to log functions
+- Objects are automatically serialized to JSON format
+
+### Fixed  
+- Fixed TypeError when passing objects to log functions
+
+---
+
 ## \[v1.4.0] - 2025-05-09
 
 ## Features
