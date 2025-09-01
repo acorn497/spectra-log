@@ -6,8 +6,6 @@
 
 [![npm version](https://img.shields.io/npm/v/spectra-log)](https://www.npmjs.com/package/spectra-log) ![license](https://img.shields.io/badge/license-MIT-green)
 
-![image](https://i.imgur.com/AaKCD2o.gif)
-
 ## 📋 Table of Contents
 
 - [Installation](#-installation)

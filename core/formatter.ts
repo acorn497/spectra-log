@@ -1,6 +1,4 @@
-// >  DIR | /core/formatter.js
-
-// --- < getPrefix, formatMultiline, etc. > ---
+// >  DIR | /core/formatter.ts
 
 import LEVEL_TYPES from "../config/levelTypes.js";
 import HTTP_MESSAGE_TYPES from "../config/httpTypes.js";
@@ -8,11 +6,12 @@ import getFormattedTime from "../util/time.js";
 import stripAnsi from "../util/stripAnsi.js";
 import stringWidth from "../util/stringWidth.js";
 
-const getPrefix = (type, level, timestamp) => {
-  const { levelLabel, color: levelColor } =
-    LEVEL_TYPES[level] || LEVEL_TYPES.default;
-  const { httpLabel, color: typeColor } =
-    HTTP_MESSAGE_TYPES[type] || HTTP_MESSAGE_TYPES.default;
+export type LevelKey = keyof typeof LEVEL_TYPES;
+export type HttpTypeKey = keyof typeof HTTP_MESSAGE_TYPES;
+
+const getPrefix = (type: HttpTypeKey, level: LevelKey, timestamp: number) => {
+  const { levelLabel, color: levelColor } = LEVEL_TYPES[level] || LEVEL_TYPES.default;
+  const { httpLabel, color: typeColor } = HTTP_MESSAGE_TYPES[type] || HTTP_MESSAGE_TYPES.default;
 
   const shortLabel = levelLabel.substring(0, 2);
   const fullLabel = shortLabel + levelLabel.substring(2);
@@ -29,13 +28,12 @@ const formatMultiline = (
 ) => {
   const visualPrefixLength = stripAnsi(prefix).length;
   const linePad = " ".repeat(36) + " | ";
-  const formatted = [];
+  const formatted: string[] = [];
 
   lines.forEach((line, i) => {
     const availWidth =
       maxWidth - (i === 0 ? visualPrefixLength : stripAnsi(linePad).length);
 
-    // If the line is empty, just add the prefix
     if (!line) {
       formatted.push(`${i === 0 ? prefix : linePad}`);
       return;
@@ -43,7 +41,6 @@ const formatMultiline = (
     const ansiLength = line.length - stripAnsi(line).length;
     let chunks = splitIntoVisualChunks(line, availWidth + ansiLength);
 
-    // If no chunks were created (e.g., only ANSI codes), treat as a single chunk
     if (chunks.length === 0) {
       chunks = [line];
     }
@@ -57,17 +54,15 @@ const formatMultiline = (
   return formatted.join("\n");
 };
 
-const splitIntoVisualChunks = (text, maxWidth) => {
-  // If text is empty, return an empty array
+const splitIntoVisualChunks = (text: string, maxWidth: number): string[] => {
   if (!text) return [];
 
-  // Extract and track all ANSI codes and their positions
-  const ansiCodesMap = new Map(); // Map to store ANSI codes by position
-  const visibleText = stripAnsi(text); // Text with all ANSI codes removed
+  const ansiCodesMap = new Map();
+  const visibleText = stripAnsi(text);
 
-  let originalIndex = 0;
-  let strippedIndex = 0;
-  let activeAnsiCodes = [];
+  let originalIndex: number = 0;
+  let strippedIndex: number = 0;
+  let activeAnsiCodes: string[] = [];
 
   while (originalIndex < text.length) {
     const ansiMatch = text.slice(originalIndex).match(/^\x1B\[[0-9;]*m/);
@@ -75,13 +70,11 @@ const splitIntoVisualChunks = (text, maxWidth) => {
     if (ansiMatch) {
       const ansiCode = ansiMatch[0];
 
-      // Store the ANSI code at the current visible text position
       if (!ansiCodesMap.has(strippedIndex)) {
         ansiCodesMap.set(strippedIndex, []);
       }
       ansiCodesMap.get(strippedIndex).push(ansiCode);
 
-      // Track active codes for line wrapping
       if (ansiCode === "\u001b[0m") {
         activeAnsiCodes = [];
       } else {
@@ -95,15 +88,13 @@ const splitIntoVisualChunks = (text, maxWidth) => {
     }
   }
 
-  // Now split the visible text based on width
-  const chunks = [];
-  let start = 0;
+  const chunks: string[] = [];
+  let start: number = 0;
 
   while (start < visibleText.length) {
     let visibleWidth = 0;
     let end = start;
 
-    // Find how many characters we can fit
     while (end < visibleText.length && visibleWidth < maxWidth) {
       const charWidth = stringWidth(visibleText[end]);
       if (visibleWidth + charWidth <= maxWidth) {
@@ -114,23 +105,19 @@ const splitIntoVisualChunks = (text, maxWidth) => {
       }
     }
 
-    // If we couldn't fit anything, force at least one character
     if (end === start && start < visibleText.length) {
       end = start + 1;
     }
 
-    // Build the chunk with all ANSI codes in their proper positions
-    let chunk = "";
-    let activeCodesForNextChunk = [];
+    let chunk: string = "";
+    let activeCodesForNextChunk: string[] = [];
 
     for (let i = start; i <= end; i++) {
-      // Insert any ANSI codes that belong at this position
       if (ansiCodesMap.has(i)) {
         const codes = ansiCodesMap.get(i);
         for (const code of codes) {
           chunk += code;
 
-          // Track active codes for next chunk
           if (code === "\u001b[0m") {
             activeCodesForNextChunk = [];
           } else {
@@ -139,7 +126,6 @@ const splitIntoVisualChunks = (text, maxWidth) => {
         }
       }
 
-      // Add the character if we're not at the end boundary
       if (i < end && i < visibleText.length) {
         chunk += visibleText[i];
       }
@@ -148,11 +134,9 @@ const splitIntoVisualChunks = (text, maxWidth) => {
     chunks.push(chunk);
     start = end;
 
-    // Apply active ANSI codes to the beginning of the next chunk
     activeAnsiCodes = [...activeCodesForNextChunk];
   }
 
-  // If we have no chunks (e.g., pure ANSI string), make sure we add it
   if (chunks.length === 0 && text) {
     chunks.push(text);
   }

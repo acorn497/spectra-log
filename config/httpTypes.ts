@@ -1,6 +1,4 @@
-// >  DIR | /config/httpTypes.js
-
-// --- < HTTP_MESSAGE_TYPES 정의 > ---
+// >  DIR | /config/httpTypes.ts
 
 import colors from "../core/colorManager.js";
 
@@ -17,16 +15,16 @@ const HTTP_MESSAGE_TYPES = {
   302: { httpLabel: "FOUND", color: colors.yellow },
   304: { httpLabel: "NOT-MODIFIED", color: colors.gray },
 
-  400: { httpLabel: "BAD-REQUEST", color: colors.orange },
-  401: { httpLabel: "UNAUTHZED", color: colors.orange },
-  402: { httpLabel: "PAY-REQUEST", color: colors.orange },
+  400: { httpLabel: "BAD-REQUEST", color: colors.red },
+  401: { httpLabel: "UNAUTHZED", color: colors.red },
+  402: { httpLabel: "PAY-REQUEST", color: colors.red },
   403: { httpLabel: "FORBIDDEN", color: colors.red },
   404: { httpLabel: "NOT-FOUND", color: colors.red },
-  405: { httpLabel: "NO-METHOD", color: colors.orange },
-  408: { httpLabel: "TIMEOUT", color: colors.orange },
-  409: { httpLabel: "CONFLICT", color: colors.orange },
-  410: { httpLabel: "GONE", color: colors.orange },
-  429: { httpLabel: "TOO-MANY", color: colors.orange },
+  405: { httpLabel: "NO-METHOD", color: colors.red },
+  408: { httpLabel: "TIMEOUT", color: colors.red },
+  409: { httpLabel: "CONFLICT", color: colors.red },
+  410: { httpLabel: "GONE", color: colors.red },
+  429: { httpLabel: "TOO-MANY", color: colors.red },
 
   500: { httpLabel: "SERVER-ERROR", color: colors.red },
   502: { httpLabel: "BAD-GATEWAY", color: colors.red },

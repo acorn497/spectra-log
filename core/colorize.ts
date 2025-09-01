@@ -1,12 +1,9 @@
 // >  DIR | /core/colorize.js
 
-// --- < {{ style : color : text }} 처리 > ---
-
 import colors from "./colorManager.js";
 
-const colorizeString = (message) => {
-  // 입력값을 안전하게 문자열로 변환
-  let processedMessage;
+const colorizeString = (message: any): string => {
+  let processedMessage: string;
   if (typeof message === 'object' && message !== null) {
     processedMessage = JSON.stringify(message, null, 2);
   } else if (message === null || message === undefined) {
@@ -16,16 +13,16 @@ const colorizeString = (message) => {
   }
   
   const regex = /\{\{\s*(?:(\w+)\s*:\s*)?(\w+)\s*:\s*([^\}]+?)\s*\}\}/g;
-
   return processedMessage.replace(regex, (match, style, color, text) => {
     style = style?.toLowerCase();
+    
+    const trimmedText = text.replace(/^ /, '').replace(/ $/, '');
+    
     const colorFn = colors[color] || colors.dim;
-
     if (style && typeof colorFn[style] === "function") {
-      return colorFn[style](text);
+      return colorFn[style](trimmedText);
     }
-
-    return colorFn(text);
+    return colorFn(trimmedText);
   });
 };
 

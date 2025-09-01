@@ -2,7 +2,7 @@
 
 // --- < Time formatter > ---
 
-const getFormattedTime = (timestamp) => {
+const getFormattedTime = (timestamp: number): string => {
   const time = new Date(timestamp);
   return `${String(time.getHours()).padStart(2, "0")}:${String(
     time.getMinutes()

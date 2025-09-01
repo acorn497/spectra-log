@@ -3,6 +3,11 @@
 **Note:** This changelog includes only **STABLE** versions.
 
 ---
+## \[2.0.0] - 2025-09-01
+### Added
+- Support with Typescript(Beta)
+
+---
 
 ## \[1.5.0] - 2025-06-09
 ### Added

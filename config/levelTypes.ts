@@ -1,6 +1,4 @@
-// >  DIR | /config/levelTypes.js
-
-// --- < LEVEL_TYPES 정의 > ---
+// >  DIR | /config/levelTypes.ts
 
 import colors from "../core/colorManager.js";
 

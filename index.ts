@@ -13,33 +13,41 @@ import {
   setPrintSpeed,
   setDisplayStandby,
 } from "./config/constants.js";
+import type { DebugLevelString } from "./config/constants.js";
 import { messageQueue } from "./config/constants.js";
 
-const log = (message, type = 200, level = "INFO", option = {}) => {
+export type LogOption = {
+  urgent?: boolean;
+  force?: boolean;
+  silent?: boolean
+};
+
+const log = (message: any, type: number = 200, level: DebugLevelString = "INFO", option: LogOption = {}) => {
   const { urgent = false, force = false } = option;
-  if (force || getProcessLevel() >= getDebugLevel(level).level) {
+  if (force === true || getProcessLevel() <= getDebugLevel(level).level) {
     message = colorizeString(message);
-    if (!urgent)
+    if (urgent === true)
+      messageQueue.unshift({ message, type, level, timestamp: Date.now() });
+    else
       messageQueue.push({ message, type, level, timestamp: Date.now() });
-    else messageQueue.unshift({ message, type, level, timestamp: Date.now() });
 
     processQueue();
   }
 };
 
-log.setDebugLevel = (level, options = {}) => {
-  const { silent = false } = options;
+log.setDebugLevel = (level: DebugLevelString, options = { silent: false }) => {
+  const { silent } = options;
 
   const temp = getDebugLevel(level);
-  setProcessLevel(temp.level);
+  setProcessLevel(level);
   silentHandler(
     silent,
     `{{ bold : yellow : Debug level }} has been changed to {{ bold : ${temp.color} : ${level} }}.`
   );
 };
 
-log.setPrintSpeed = (delay, options = {}) => {
-  const { silent = false } = options;
+log.setPrintSpeed = (delay: number, option: LogOption = {}) => {
+  const { silent = false } = option;
 
   setPrintSpeed(delay);
   silentHandler(
@@ -48,7 +56,7 @@ log.setPrintSpeed = (delay, options = {}) => {
   );
 };
 
-log.setSmoothPrint = (value, options = {}) => {
+log.setSmoothPrint = (value, options: LogOption = {}) => {
   const { silent = false } = options;
 
   setSmoothPrint(value);
@@ -58,7 +66,7 @@ log.setSmoothPrint = (value, options = {}) => {
   );
 };
 
-log.setDisplayStandby = (value, options = {}) => {
+log.setDisplayStandby = (value: boolean, options = {}) => {
   setDisplayStandby(value);
   deprecationHandler(
     `{{ bold : yellow : Stand by }} mode has been {{ bold : ${value ? "green : ACTIVATED" : "red : DEACTIVATED"} }}`,
@@ -68,7 +76,7 @@ log.setDisplayStandby = (value, options = {}) => {
   processQueue();
 };
 
-log.setDisplayStandBy = (value, options = {}) => {
+log.setDisplayStandBy = (value: boolean, options: LogOption = {}) => {
   const { silent = false } = options;
 
   setDisplayStandby(value);
@@ -78,17 +86,16 @@ log.setDisplayStandBy = (value, options = {}) => {
   );
 };
 
-const silentHandler = (silent, message) => {
+const silentHandler = (silent: boolean = false, message: string) => {
   if (!silent) {
     log(message, 202, "INFO", { force: true });
     processQueue();
   }
 };
 
-const deprecationHandler = (message, before, after) => {
+const deprecationHandler = (message: string, before: string, after: string) => {
   log(
-    `${message}
-    \n[{{ bold : red : DEPRECATION WARNING }}] {{ bold : yellow : ${before} }} is deprecated. Use {{ bold : green : ${after} }} instead.\nIt will be removed at next Major update.\n`
+    `${message}\n    \n[{{ bold : red : DEPRECATION WARNING }}] {{ bold : yellow : ${before} }} is deprecated. Use {{ bold : green : ${after} }} instead.\nIt will be removed at next Major update.\n`
   );
 }
 

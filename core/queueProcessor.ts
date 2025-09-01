@@ -1,10 +1,8 @@
 // >  DIR | /core/queueProcessor.js
 
-// --- < printMessage, processQueue, standby 로그 > ---
-
 import printSmooth from "./printer.js";
 import { getPrefix, formatMultiline } from "./formatter.js";
-import getDebugLevel from "../util/debugLevel.js";
+import type { HttpTypeKey, LevelKey } from "./formatter.js";
 
 import {
   getProcessLevel,
@@ -21,7 +19,7 @@ import sleep from "../util/sleep.js";
 
 let isStandbyActive = false;
 
-const printMessage = async (message, type, level, timestamp) => {
+const printMessage = async (message: string, type: HttpTypeKey, level: LevelKey, timestamp: number) => {
   const prefix = getPrefix(type, level, timestamp);
   const str =
     typeof message === "object"
@@ -42,13 +40,29 @@ const processQueue = async () => {
   setIsProcessing(true);
 
   const item = messageQueue.shift();
-  if (getProcessLevel() >= getDebugLevel(item.level)) {
+  if (!item || typeof item !== "object" || item === null) {
+    setIsProcessing(false);
+    if (messageQueue.length === 0) {
+      startStandbyLog();
+    } else {
+      processQueue();
+    }
+    return;
   }
-  const { message, type, level, timestamp } = item;
+  const { message, type, level, timestamp } = item as {
+    message?: any;
+    type?: any;
+    level?: any;
+    timestamp?: any;
+  };
   await printMessage(message, type, level, timestamp);
 
   setIsProcessing(false);
-  messageQueue.length === 0 ? startStandbyLog() : processQueue();
+  if (messageQueue.length === 0) {
+    startStandbyLog();
+  } else {
+    processQueue();
+  }
 };
 
 const startStandbyLog = () => {
@@ -57,7 +71,7 @@ const startStandbyLog = () => {
 
   (async function standbyLoop() {
     while (isStandbyActive) {
-      const prefix = getPrefix(0, "INFO", Date.now()).replace(
+      const prefix = getPrefix("default", "INFO", Date.now()).replace(
         /\[.*?\]/,
         `[ ${colors.yellow.bold("STBY")}   | -            | ${getFormattedTime(
           Date.now()
